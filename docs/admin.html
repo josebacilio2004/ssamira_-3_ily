@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Podcast de Amor 🔒</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&family=Dancing+Script:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="bg-canvas" aria-hidden="true"></div>
+
+<!-- ══ PASSWORD SCREEN ══════════════════════════════════════ -->
+<div id="password-screen" class="password-screen">
+  <div class="glass-heavy password-card fade-in">
+    <span class="password-icon">🔒</span>
+    <h1 class="admin-title" style="margin-bottom:0.4rem;">Panel Admin</h1>
+    <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:2rem;">
+      Solo tú puedes entrar aquí 💌
+    </p>
+    <form id="login-form">
+      <div class="form-group">
+        <label class="form-label" for="pass-input">Contraseña</label>
+        <input class="form-input" type="password" id="pass-input"
+               placeholder="••••••••" autocomplete="current-password" required>
+      </div>
+      <div id="login-error" style="color:#ff8fa3;font-size:0.82rem;margin-bottom:1rem;display:none;">
+        ❌ Contraseña incorrecta
+      </div>
+      <button type="submit" class="btn btn-primary btn-full">🌹 Entrar</button>
+    </form>
+    <div style="margin-top:1.5rem;text-align:center;">
+      <a href="index.html" class="btn btn-ghost" style="font-size:0.82rem;padding:0.55rem 1rem;">
+        ← Ver el podcast
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ADMIN PANEL ══════════════════════════════════════════ -->
+<div id="admin-content" style="display:none;" class="app-wrapper">
+  <div class="container">
+
+    <header class="admin-header">
+      <div class="header-badge" style="margin-bottom:1rem;"><span>🎙️</span><span>Panel Admin</span></div>
+      <h1 class="admin-title">Podcast de Amor</h1>
+      <p style="color:var(--text-muted);font-size:0.85rem;">Gestiona los episodios y personaliza el sitio</p>
+    </header>
+
+    <!-- Stats -->
+    <div class="admin-grid">
+      <div class="glass stat-card">
+        <div class="stat-number" id="stat-episodes">0</div>
+        <div class="stat-label">Episodios</div>
+      </div>
+      <div class="glass stat-card">
+        <div class="stat-number" id="stat-total">0:00</div>
+        <div class="stat-label">Duración Total</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs" role="tablist">
+      <button class="tab-btn active" data-tab="upload"   role="tab" aria-selected="true">📤 Nuevo episodio</button>
+      <button class="tab-btn"        data-tab="episodes" role="tab" aria-selected="false">🎶 Episodios</button>
+      <button class="tab-btn"        data-tab="firebase" role="tab" aria-selected="false">🔥 Firebase</button>
+      <button class="tab-btn"        data-tab="settings" role="tab" aria-selected="false">⚙️ Personalizar</button>
+      <button class="tab-btn"        data-tab="security" role="tab" aria-selected="false">🔒 Seguridad</button>
+    </div>
+
+    <!-- ══ TAB: Upload ════════════════════════════════════════ -->
+    <div class="tab-panel active" id="panel-upload">
+      <div class="glass section-card">
+        <h2 class="section-card-title">📤 Agregar nuevo episodio</h2>
+
+        <!-- Source selector -->
+        <div style="display:flex;gap:0.5rem;margin-bottom:1.25rem;">
+          <button type="button" class="tab-btn active" id="src-local-btn"   onclick="setSrcMode('local')">📁 Archivo local / GitHub</button>
+          <button type="button" class="tab-btn"        id="src-firebase-btn" onclick="setSrcMode('firebase')">🔥 Subir a Firebase</button>
+          <button type="button" class="tab-btn"        id="src-url-btn"      onclick="setSrcMode('url')">🔗 URL externa</button>
+        </div>
+
+        <!-- Local / GitHub mode -->
+        <div id="mode-local">
+          <div class="hint-box">
+            <strong>Modo GitHub Pages:</strong> Sube tu <code>.mp3</code> a la carpeta
+            <code>docs/audio/</code> del repositorio y escribe la ruta relativa abajo.<br>
+            Ejemplo: <code>audio/episodio-01.mp3</code>
+          </div>
+        </div>
+
+        <!-- Firebase upload mode -->
+        <div id="mode-firebase" style="display:none;">
+          <div id="firebase-status-bar"></div>
+          <div class="hint-box" id="firebase-hint">
+            <strong>🔥 Firebase Storage:</strong> Configura Firebase en la pestaña
+            <strong>🔥 Firebase</strong> primero, luego regresa aquí para subir archivos directamente.
+          </div>
+          <div id="firebase-upload-area" style="display:none;">
+            <div class="drop-zone" id="firebase-drop-zone">
+              <input type="file" id="firebase-file-input" accept="audio/*" aria-label="Seleccionar archivo de audio">
+              <div class="drop-icon">🎵</div>
+              <div class="drop-text">Arrastra tu audio aquí o <span>selecciona un archivo</span></div>
+              <p style="font-size:0.75rem;color:var(--text-muted);margin-top:0.4rem;">MP3, M4A, OGG — máx. 100MB</p>
+            </div>
+            <div class="upload-progress" id="firebase-progress" style="display:none;">
+              <div class="upload-progress-fill" id="firebase-progress-fill"></div>
+            </div>
+            <p id="firebase-upload-status" style="font-size:0.82rem;color:var(--text-muted);margin-top:0.5rem;"></p>
+          </div>
+        </div>
+
+        <!-- URL mode -->
+        <div id="mode-url" style="display:none;">
+          <div class="hint-box">
+            <strong>URL externa:</strong> Pega el enlace directo a tu audio. Puedes usar
+            Google Drive (enlace de descarga directa), Dropbox, o cualquier servidor.<br>
+            Para <strong>Google Drive</strong>: compartir → "Cualquier persona con el enlace" →
+            reemplazar <code>/view</code> por <code>/uc?export=download</code>
+          </div>
+        </div>
+
+        <form id="upload-form" novalidate>
+          <div class="two-col">
+            <div class="form-group">
+              <label class="form-label" for="ep-title">Título del episodio *</label>
+              <input class="form-input" type="text" id="ep-title"
+                     placeholder="Ej: La primera vez que te vi" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="ep-src">Ruta / URL del audio *</label>
+              <input class="form-input" type="text" id="ep-src"
+                     placeholder="audio/episodio-01.mp3" required id="ep-src">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="ep-desc">Descripción (opcional)</label>
+            <textarea class="form-textarea" id="ep-desc"
+                      placeholder="Una pequeña nota sobre este episodio…"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Emoji del episodio</label>
+            <div class="emoji-picker" id="emoji-picker" role="group" aria-label="Selector de emoji"></div>
+            <input type="hidden" id="ep-emoji" value="🎙️">
+          </div>
+          <div class="divider"></div>
+          <div class="upload-progress" id="upload-progress">
+            <div class="upload-progress-fill" id="upload-progress-fill"></div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">💖 Publicar episodio</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ══ TAB: Episodes ══════════════════════════════════════ -->
+    <div class="tab-panel" id="panel-episodes">
+      <div class="glass section-card">
+        <h2 class="section-card-title">🎶 Episodios publicados</h2>
+        <div class="admin-ep-list" id="admin-ep-list"></div>
+      </div>
+    </div>
+
+    <!-- ══ TAB: Firebase ══════════════════════════════════════ -->
+    <div class="tab-panel" id="panel-firebase">
+      <div class="glass section-card">
+        <h2 class="section-card-title">🔥 Configuración de Firebase Storage</h2>
+
+        <div class="hint-box" style="background:rgba(255,152,0,0.08);border-color:rgba(255,152,0,0.25);color:#FFD580;">
+          <strong>¿Por qué Firebase?</strong><br>
+          Firebase Storage te permite subir tus archivos de audio directamente desde el panel admin,
+          sin necesidad de usar GitHub. ¡Perfecto para archivos grandes!<br><br>
+          <strong>Pasos para configurar:</strong><br>
+          1. Ve a <a href="https://console.firebase.google.com" target="_blank" style="color:#FFD580;">console.firebase.google.com</a><br>
+          2. Crea un proyecto → Activa Storage<br>
+          3. Ve a Configuración del proyecto → Tus apps → Web → Copia la config<br>
+          4. Pega los valores abajo y guarda<br>
+          5. En Firebase Console → Storage → Rules → cambia <code>allow read, write: if false;</code>
+          por <code>allow read, write: if true;</code> (solo para testing)<br><br>
+          <strong>CLI (opcional):</strong>
+          <code style="display:block;margin-top:0.3rem;background:rgba(0,0,0,0.3);padding:0.4rem 0.6rem;border-radius:6px;font-size:0.8rem;">
+            npm install -g firebase-tools<br>
+            firebase login<br>
+            firebase init storage<br>
+            firebase deploy --only storage
+          </code>
+        </div>
+
+        <div id="firebase-connected-banner" style="display:none;">
+          <div class="firebase-status connected" style="margin-bottom:1rem;">
+            <span class="firebase-dot"></span>
+            Firebase conectado correctamente ✅
+          </div>
+        </div>
+
+        <form id="firebase-config-form">
+          <div class="two-col">
+            <div class="form-group">
+              <label class="form-label" for="fb-api-key">apiKey</label>
+              <input class="form-input" type="text" id="fb-api-key" placeholder="AIzaSy...">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="fb-project-id">projectId</label>
+              <input class="form-input" type="text" id="fb-project-id" placeholder="mi-podcast-amor">
+            </div>
+          </div>
+          <div class="two-col">
+            <div class="form-group">
+              <label class="form-label" for="fb-storage-bucket">storageBucket</label>
+              <input class="form-input" type="text" id="fb-storage-bucket" placeholder="mi-podcast-amor.appspot.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label" for="fb-auth-domain">authDomain</label>
+              <input class="form-input" type="text" id="fb-auth-domain" placeholder="mi-podcast-amor.firebaseapp.com">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="fb-messaging-id">messagingSenderId (opcional)</label>
+            <input class="form-input" type="text" id="fb-messaging-id" placeholder="123456789">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="fb-app-id">appId</label>
+            <input class="form-input" type="text" id="fb-app-id" placeholder="1:123456:web:abc123">
+          </div>
+          <div class="divider"></div>
+          <div style="display:flex;gap:0.75rem;">
+            <button type="submit" class="btn btn-primary" style="flex:1;">🔥 Guardar y conectar Firebase</button>
+            <button type="button" class="btn btn-ghost" id="fb-clear-btn">Limpiar</button>
+          </div>
+        </form>
+
+        <div class="divider"></div>
+
+        <!-- Drive alternative -->
+        <h3 style="font-family:'Playfair Display',serif;color:var(--text-primary);font-size:1rem;margin-bottom:0.75rem;">
+          📁 Alternativa: Google Drive
+        </h3>
+        <div class="hint-box" style="background:rgba(66,133,244,0.08);border-color:rgba(66,133,244,0.25);color:#A8C7FA;">
+          <strong>Cómo usar Google Drive como hosting de audio:</strong><br>
+          1. Sube tu MP3 a Google Drive<br>
+          2. Click derecho → Compartir → "Cualquiera con el enlace"<br>
+          3. Copia el ID del archivo de la URL: <code>https://drive.google.com/file/d/<strong>FILE_ID</strong>/view</code><br>
+          4. Tu URL directa será:<br>
+          <code style="display:block;margin-top:0.3rem;background:rgba(0,0,0,0.3);padding:0.4rem 0.6rem;border-radius:6px;font-size:0.78rem;">
+            https://drive.google.com/uc?export=download&id=FILE_ID
+          </code>
+          5. Pega esa URL en el campo "URL del audio" al crear el episodio
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="drive-id-input">Convertir ID de Drive → URL directa</label>
+          <div style="display:flex;gap:0.5rem;">
+            <input class="form-input" type="text" id="drive-id-input"
+                   placeholder="Pega el ID o la URL completa de Drive" style="flex:1;">
+            <button type="button" class="btn btn-ghost" id="drive-convert-btn">Convertir</button>
+          </div>
+          <div id="drive-result" style="margin-top:0.6rem;display:none;">
+            <input class="form-input" type="text" id="drive-url-output" readonly
+                   style="font-size:0.8rem;background:rgba(66,133,244,0.1);">
+            <button type="button" class="btn btn-ghost" id="drive-copy-btn"
+                    style="margin-top:0.4rem;font-size:0.8rem;padding:0.4rem 0.8rem;">
+              📋 Copiar URL
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ TAB: Settings ══════════════════════════════════════ -->
+    <div class="tab-panel" id="panel-settings">
+      <div class="glass section-card">
+        <h2 class="section-card-title">✨ Personalización del sitio</h2>
+        <form id="settings-form">
+          <div class="form-group">
+            <label class="form-label" for="s-podcast-title">Nombre del podcast</label>
+            <input class="form-input" type="text" id="s-podcast-title" placeholder="Para Ti, Mi Amor">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="s-podcast-subtitle">Subtítulo</label>
+            <input class="form-input" type="text" id="s-podcast-subtitle" placeholder="Cada episodio es un pedacito de mi corazón…">
+          </div>
+          <div class="divider"></div>
+          <div class="form-group">
+            <label class="form-label" for="s-love-quote">Cita de amor (HTML permitido: &lt;br&gt;)</label>
+            <textarea class="form-textarea" id="s-love-quote" style="min-height:100px;"
+                      placeholder='"Cada palabra que escuchas fue pensada para ti…"'></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="s-love-from">Firma</label>
+            <input class="form-input" type="text" id="s-love-from" placeholder="Con todo mi amor">
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">💾 Guardar cambios</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ══ TAB: Security ══════════════════════════════════════ -->
+    <div class="tab-panel" id="panel-security">
+      <div class="glass section-card">
+        <h2 class="section-card-title">🔒 Cambiar contraseña</h2>
+        <form id="security-form">
+          <div class="form-group">
+            <label class="form-label" for="old-pass">Contraseña actual</label>
+            <input class="form-input" type="password" id="old-pass" placeholder="••••••••" autocomplete="current-password">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="new-pass">Nueva contraseña</label>
+            <input class="form-input" type="password" id="new-pass" placeholder="••••••••" autocomplete="new-password">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="confirm-pass">Confirmar</label>
+            <input class="form-input" type="password" id="confirm-pass" placeholder="••••••••" autocomplete="new-password">
+          </div>
+          <div class="divider"></div>
+          <button type="submit" class="btn btn-primary btn-full">🔐 Actualizar contraseña</button>
+        </form>
+      </div>
+      <div class="glass section-card">
+        <h2 class="section-card-title">⚠️ Zona de peligro</h2>
+        <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1.25rem;">Elimina todos los episodios. Esta acción no se puede deshacer.</p>
+        <button class="btn btn-ghost" id="btn-clear-all" style="color:#ff8fa3;border-color:rgba(220,60,60,0.3);">
+          🗑️ Borrar todos los episodios
+        </button>
+      </div>
+      <div class="glass section-card">
+        <h2 class="section-card-title">🚪 Sesión</h2>
+        <button class="btn btn-ghost btn-full" id="btn-logout">Cerrar sesión</button>
+      </div>
+    </div>
+
+    <div style="text-align:center;padding:2rem 0 3rem;color:var(--text-muted);font-size:0.78rem;">
+      <a href="index.html" style="color:var(--rose-soft);text-decoration:none;">← Ver el podcast como tu pareja</a>
+    </div>
+
+  </div><!-- /container -->
+</div><!-- /admin-content -->
+
+<!-- Edit Episode Modal -->
+<div class="modal-overlay" id="edit-modal" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
+  <div class="glass-heavy modal" style="position:relative;">
+    <button class="modal-close" id="edit-modal-close" aria-label="Cerrar">✕</button>
+    <h2 class="modal-title" id="edit-modal-title">✏️ Editar episodio</h2>
+    <p class="modal-subtitle">Modifica los detalles</p>
+    <form id="edit-form">
+      <input type="hidden" id="edit-ep-id">
+      <div class="form-group">
+        <label class="form-label" for="edit-title">Título</label>
+        <input class="form-input" type="text" id="edit-title" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="edit-src">Ruta del audio</label>
+        <input class="form-input" type="text" id="edit-src" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="edit-desc">Descripción</label>
+        <textarea class="form-textarea" id="edit-desc"></textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Emoji</label>
+        <div class="emoji-picker" id="edit-emoji-picker"></div>
+        <input type="hidden" id="edit-emoji" value="🎙️">
+      </div>
+      <button type="submit" class="btn btn-primary btn-full" style="margin-top:0.75rem;">💾 Guardar</button>
+    </form>
+  </div>
+</div>
+
+<!-- Firebase SDK (ES Modules) -->
+<script type="module" id="firebase-module">
+  // Firebase is initialized dynamically when config is set
+  window.FirebaseSDK = null;
+  window.firebaseStorage = null;
+  window.firebaseApp = null;
+
+  window.initFirebase = async function(config) {
+    try {
+      const { initializeApp, getApps, deleteApp } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+      const { getStorage, ref, uploadBytesResumable, getDownloadURL } = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js');
+
+      // Clear existing app if any
+      const apps = getApps();
+      if (apps.length > 0) await deleteApp(apps[0]);
+
+      window.firebaseApp     = initializeApp(config);
+      window.firebaseStorage = getStorage(window.firebaseApp);
+      window.fbUploadFile    = async function(file, onProgress) {
+        const storageRef = ref(window.firebaseStorage, `audio/${Date.now()}_${file.name}`);
+        return new Promise((resolve, reject) => {
+          const task = uploadBytesResumable(storageRef, file);
+          task.on('state_changed',
+            snap => { onProgress && onProgress(snap.bytesTransferred / snap.totalBytes * 100); },
+            reject,
+            async () => { resolve(await getDownloadURL(task.snapshot.ref)); }
+          );
+        });
+      };
+      return true;
+    } catch (e) {
+      console.error('Firebase init error:', e);
+      return false;
+    }
+  };
+</script>
+
+<script src="app.js"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════
+   ADMIN PAGE LOGIC
+═══════════════════════════════════════════════════════════ */
+
+const SESSION_KEY  = 'samira_admin_session';
+const META_KEY     = 'samira_podcast_meta';
+const FB_KEY       = 'samira_firebase_config';
+const EPISODE_EMOJIS = ['🎙️','🌹','💗','💌','🎶','✨','🌸','💑','💞','🥰','🎵','🌺','💖','🍀','🌙','⭐','🕊️','💫','🎤','🎼'];
+
+/* ── Auth ─────────────────────────────────────────────────── */
+const isAuth    = () => sessionStorage.getItem(SESSION_KEY) === '1';
+const setAuth   = () => sessionStorage.setItem(SESSION_KEY, '1');
+const doLogout  = () => { sessionStorage.removeItem(SESSION_KEY); location.reload(); };
+
+function boot() {
+  if (isAuth()) { showPanel(); }
+  else { document.getElementById('password-screen').style.display = 'flex'; }
+}
+
+document.getElementById('login-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const val = document.getElementById('pass-input').value;
+  const err = document.getElementById('login-error');
+  if (checkPassword(val)) {
+    err.style.display = 'none';
+    setAuth();
+    showPanel();
+  } else {
+    err.style.display = 'block';
+    document.getElementById('pass-input').value = '';
+    document.getElementById('pass-input').focus();
+  }
+});
+
+function showPanel() {
+  document.getElementById('password-screen').style.display = 'none';
+  document.getElementById('admin-content').style.display   = 'block';
+  initEmojiPicker('emoji-picker', 'ep-emoji');
+  initEmojiPicker('edit-emoji-picker', 'edit-emoji');
+  loadSettings();
+  loadFirebaseConfig();
+  renderAdminEpisodes();
+  updateStats();
+}
+
+/* ── Stats ────────────────────────────────────────────────── */
+function updateStats() {
+  const eps = getEpisodes();
+  document.getElementById('stat-episodes').textContent = eps.length;
+  const total = eps.reduce((acc, e) => {
+    if (!e.cachedDuration) return acc;
+    const [m,s] = e.cachedDuration.split(':').map(Number);
+    return acc + m*60 + (s||0);
+  }, 0);
+  document.getElementById('stat-total').textContent = total > 0 ? formatTime(total) : '0:00';
+}
+
+/* ── Tabs ─────────────────────────────────────────────────── */
+document.querySelectorAll('.tab-btn[data-tab]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn[data-tab]').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active'); btn.setAttribute('aria-selected','true');
+    document.getElementById(`panel-${btn.dataset.tab}`).classList.add('active');
+    if (btn.dataset.tab === 'episodes') renderAdminEpisodes();
+  });
+});
+
+/* ── Source Mode ──────────────────────────────────────────── */
+let currentSrcMode = 'local';
+function setSrcMode(mode) {
+  currentSrcMode = mode;
+  ['local','firebase','url'].forEach(m => {
+    document.getElementById(`mode-${m}`).style.display = m === mode ? 'block' : 'none';
+    document.getElementById(`src-${m}-btn`).classList.toggle('active', m === mode);
+  });
+  if (mode === 'firebase') checkFirebaseStatus();
+}
+
+function checkFirebaseStatus() {
+  const cfg = getFirebaseConfig();
+  const bar  = document.getElementById('firebase-status-bar');
+  const hint = document.getElementById('firebase-hint');
+  const uploadArea = document.getElementById('firebase-upload-area');
+  if (cfg && window.firebaseStorage) {
+    bar.innerHTML = `<div class="firebase-status connected"><span class="firebase-dot"></span>Firebase conectado</div>`;
+    hint.style.display   = 'none';
+    uploadArea.style.display = 'block';
+  } else if (cfg) {
+    bar.innerHTML = `<div class="firebase-status disconnected"><span class="firebase-dot"></span>Config guardada — conectando…</div>`;
+    hint.style.display   = 'none';
+    uploadArea.style.display = 'none';
+  } else {
+    bar.innerHTML = '';
+    hint.style.display   = 'block';
+    uploadArea.style.display = 'none';
+  }
+}
+
+/* ── Firebase Config ──────────────────────────────────────── */
+function getFirebaseConfig() {
+  try { return JSON.parse(localStorage.getItem(FB_KEY)); } catch { return null; }
+}
+function loadFirebaseConfig() {
+  const cfg = getFirebaseConfig();
+  if (!cfg) return;
+  document.getElementById('fb-api-key').value        = cfg.apiKey        || '';
+  document.getElementById('fb-project-id').value     = cfg.projectId     || '';
+  document.getElementById('fb-storage-bucket').value = cfg.storageBucket || '';
+  document.getElementById('fb-auth-domain').value    = cfg.authDomain    || '';
+  document.getElementById('fb-messaging-id').value   = cfg.messagingSenderId || '';
+  document.getElementById('fb-app-id').value         = cfg.appId         || '';
+  document.getElementById('firebase-connected-banner').style.display = 'none';
+  /* Auto-init if config exists */
+  if (cfg.apiKey && cfg.projectId) {
+    window.initFirebase && window.initFirebase(cfg).then(ok => {
+      if (ok) document.getElementById('firebase-connected-banner').style.display = 'block';
+    });
+  }
+}
+
+document.getElementById('firebase-config-form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const cfg = {
+    apiKey:            document.getElementById('fb-api-key').value.trim(),
+    projectId:         document.getElementById('fb-project-id').value.trim(),
+    storageBucket:     document.getElementById('fb-storage-bucket').value.trim(),
+    authDomain:        document.getElementById('fb-auth-domain').value.trim(),
+    messagingSenderId: document.getElementById('fb-messaging-id').value.trim(),
+    appId:             document.getElementById('fb-app-id').value.trim(),
+  };
+  if (!cfg.apiKey || !cfg.projectId || !cfg.storageBucket) {
+    showToast('Completa apiKey, projectId y storageBucket como mínimo', 'error');
+    return;
+  }
+  localStorage.setItem(FB_KEY, JSON.stringify(cfg));
+  const ok = await window.initFirebase(cfg);
+  if (ok) {
+    document.getElementById('firebase-connected-banner').style.display = 'block';
+    showToast('✅ Firebase conectado correctamente 🔥', 'success');
+  } else {
+    showToast('❌ Error conectando Firebase. Verifica los datos.', 'error');
+  }
+});
+
+document.getElementById('fb-clear-btn').addEventListener('click', () => {
+  localStorage.removeItem(FB_KEY);
+  document.getElementById('firebase-config-form').reset();
+  document.getElementById('firebase-connected-banner').style.display = 'none';
+  window.firebaseStorage = null;
+  showToast('Configuración de Firebase eliminada', 'info');
+});
+
+/* ── Firebase File Upload ─────────────────────────────────── */
+const fbFileInput  = document.getElementById('firebase-file-input');
+const fbDropZone   = document.getElementById('firebase-drop-zone');
+const fbProgress   = document.getElementById('firebase-progress');
+const fbProgressFill = document.getElementById('firebase-progress-fill');
+const fbStatus     = document.getElementById('firebase-upload-status');
+
+async function uploadToFirebase(file) {
+  if (!window.firebaseStorage) {
+    showToast('Firebase no está conectado', 'error'); return;
+  }
+  fbProgress.style.display = 'block';
+  fbStatus.textContent = 'Subiendo…';
+  fbProgressFill.style.width = '0%';
+  try {
+    const url = await window.fbUploadFile(file, pct => {
+      fbProgressFill.style.width = `${pct}%`;
+      fbStatus.textContent = `Subiendo… ${Math.round(pct)}%`;
+    });
+    fbProgress.style.display = 'none';
+    fbStatus.textContent = '✅ Subido con éxito';
+    document.getElementById('ep-src').value = url;
+    showToast('✅ Audio subido a Firebase 🔥', 'success');
+  } catch (err) {
+    fbProgress.style.display = 'none';
+    fbStatus.textContent = '❌ Error al subir';
+    showToast('Error al subir a Firebase: ' + err.message, 'error');
+  }
+}
+
+fbFileInput.addEventListener('change', e => { if (e.target.files[0]) uploadToFirebase(e.target.files[0]); });
+fbDropZone.addEventListener('dragover', e => { e.preventDefault(); fbDropZone.classList.add('drag-over'); });
+fbDropZone.addEventListener('dragleave', ()=> fbDropZone.classList.remove('drag-over'));
+fbDropZone.addEventListener('drop', e => {
+  e.preventDefault(); fbDropZone.classList.remove('drag-over');
+  if (e.dataTransfer.files[0]) uploadToFirebase(e.dataTransfer.files[0]);
+});
+
+/* ── Emoji Picker ─────────────────────────────────────────── */
+function initEmojiPicker(containerId, inputId) {
+  const container = document.getElementById(containerId);
+  const input     = document.getElementById(inputId);
+  container.innerHTML = EPISODE_EMOJIS.map(em => `
+    <button type="button" class="emoji-opt ${em === input.value ? 'selected' : ''}"
+      data-emoji="${em}" aria-label="${em}">${em}</button>`).join('');
+  container.querySelectorAll('.emoji-opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      container.querySelectorAll('.emoji-opt').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected'); input.value = btn.dataset.emoji;
+    });
+  });
+}
+
+/* ── Upload Form ──────────────────────────────────────────── */
+document.getElementById('upload-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const title = document.getElementById('ep-title').value.trim();
+  const src   = document.getElementById('ep-src').value.trim();
+  const desc  = document.getElementById('ep-desc').value.trim();
+  const emoji = document.getElementById('ep-emoji').value;
+  if (!title || !src) { showToast('Título y ruta de audio son obligatorios', 'error'); return; }
+
+  const prog = document.getElementById('upload-progress');
+  const fill = document.getElementById('upload-progress-fill');
+  prog.style.display = 'block';
+  let pct = 0;
+  const iv = setInterval(() => {
+    pct += Math.random() * 20;
+    fill.style.width = `${Math.min(pct, 95)}%`;
+    if (pct >= 95) {
+      clearInterval(iv);
+      setTimeout(() => {
+        fill.style.width = '100%';
+        setTimeout(() => {
+          addEpisode({ title, src, description: desc, emoji });
+          showToast('✅ Episodio publicado con éxito 💖', 'success');
+          document.getElementById('upload-form').reset();
+          initEmojiPicker('emoji-picker','ep-emoji');
+          prog.style.display  = 'none';
+          fill.style.width    = '0%';
+          updateStats();
+        }, 300);
+      }, 400);
+    }
+  }, 100);
+});
+
+/* ── Admin Episodes ───────────────────────────────────────── */
+function renderAdminEpisodes() {
+  const list = document.getElementById('admin-ep-list');
+  const eps  = getEpisodes();
+  if (eps.length === 0) {
+    list.innerHTML = `<div class="empty-state" style="padding:2rem 1rem;"><div class="empty-icon">🎙️</div><h3>Sin episodios aún</h3><p>Agrega el primer episodio en "Nuevo episodio"</p></div>`;
+    return;
+  }
+  list.innerHTML = eps.map((ep, idx) => `
+    <div class="glass admin-ep-card">
+      <div class="ep-thumb" style="width:48px;height:48px;font-size:1.2rem;">${ep.emoji||'🎙️'}</div>
+      <div class="ep-info" style="flex:1;min-width:0;">
+        <div class="ep-title" style="font-size:0.95rem;">${ep.title}</div>
+        <div class="ep-desc">${ep.src}</div>
+      </div>
+      <div class="admin-ep-actions">
+        <button class="icon-btn" data-action="edit"   data-id="${ep.id}" aria-label="Editar">✏️</button>
+        <button class="icon-btn danger" data-action="delete" data-id="${ep.id}" aria-label="Eliminar">🗑️</button>
+      </div>
+    </div>`).join('');
+  list.querySelectorAll('[data-action="delete"]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (confirm('¿Eliminar este episodio?')) {
+        deleteEpisode(btn.dataset.id);
+        renderAdminEpisodes(); updateStats();
+        showToast('Episodio eliminado', 'info');
+      }
+    });
+  });
+  list.querySelectorAll('[data-action="edit"]').forEach(btn => {
+    btn.addEventListener('click', () => openEditModal(btn.dataset.id));
+  });
+}
+
+/* ── Edit Modal ───────────────────────────────────────────── */
+function openEditModal(id) {
+  const ep = getEpisodes().find(e => e.id === id);
+  if (!ep) return;
+  document.getElementById('edit-ep-id').value  = id;
+  document.getElementById('edit-title').value  = ep.title;
+  document.getElementById('edit-src').value    = ep.src;
+  document.getElementById('edit-desc').value   = ep.description || '';
+  document.getElementById('edit-emoji').value  = ep.emoji || '🎙️';
+  initEmojiPicker('edit-emoji-picker','edit-emoji');
+  document.getElementById('edit-modal').classList.add('open');
+}
+document.getElementById('edit-modal-close').addEventListener('click', () => document.getElementById('edit-modal').classList.remove('open'));
+document.getElementById('edit-modal').addEventListener('click', e => { if (e.target === document.getElementById('edit-modal')) document.getElementById('edit-modal').classList.remove('open'); });
+document.getElementById('edit-form').addEventListener('submit', e => {
+  e.preventDefault();
+  updateEpisode(document.getElementById('edit-ep-id').value, {
+    title: document.getElementById('edit-title').value.trim(),
+    src:   document.getElementById('edit-src').value.trim(),
+    description: document.getElementById('edit-desc').value.trim(),
+    emoji: document.getElementById('edit-emoji').value,
+  });
+  document.getElementById('edit-modal').classList.remove('open');
+  renderAdminEpisodes();
+  showToast('✅ Episodio actualizado', 'success');
+});
+
+/* ── Google Drive Converter ───────────────────────────────── */
+document.getElementById('drive-convert-btn').addEventListener('click', () => {
+  const raw = document.getElementById('drive-id-input').value.trim();
+  let id = raw;
+  const match = raw.match(/\/d\/([a-zA-Z0-9_-]+)/);
+  if (match) id = match[1];
+  if (!id) { showToast('Pega el ID o URL de Drive', 'error'); return; }
+  const url = `https://drive.google.com/uc?export=download&id=${id}`;
+  document.getElementById('drive-url-output').value = url;
+  document.getElementById('drive-result').style.display = 'block';
+});
+document.getElementById('drive-copy-btn').addEventListener('click', () => {
+  const url = document.getElementById('drive-url-output').value;
+  navigator.clipboard.writeText(url).then(() => showToast('✅ URL copiada al portapapeles', 'success'));
+});
+
+/* ── Settings ─────────────────────────────────────────────── */
+function getMeta() { try { return JSON.parse(localStorage.getItem(META_KEY))||{}; } catch { return {}; } }
+function loadSettings() {
+  const m = getMeta();
+  if (m.podcastTitle)    document.getElementById('s-podcast-title').value    = m.podcastTitle;
+  if (m.podcastSubtitle) document.getElementById('s-podcast-subtitle').value = m.podcastSubtitle;
+  if (m.loveQuote)       document.getElementById('s-love-quote').value       = m.loveQuote;
+  if (m.loveFrom)        document.getElementById('s-love-from').value        = m.loveFrom;
+}
+document.getElementById('settings-form').addEventListener('submit', e => {
+  e.preventDefault();
+  localStorage.setItem(META_KEY, JSON.stringify({
+    podcastTitle:    document.getElementById('s-podcast-title').value.trim()    || 'Para Ti, Mi Amor',
+    podcastSubtitle: document.getElementById('s-podcast-subtitle').value.trim() || '',
+    loveQuote:       document.getElementById('s-love-quote').value.trim()       || '',
+    loveFrom:        document.getElementById('s-love-from').value.trim()        || 'Con todo mi amor',
+  }));
+  showToast('✅ Sitio personalizado 💖', 'success');
+});
+
+/* ── Security ─────────────────────────────────────────────── */
+document.getElementById('security-form').addEventListener('submit', e => {
+  e.preventDefault();
+  const oldP = document.getElementById('old-pass').value;
+  const newP = document.getElementById('new-pass').value;
+  const conf = document.getElementById('confirm-pass').value;
+  if (!checkPassword(oldP)) { showToast('❌ Contraseña actual incorrecta','error'); return; }
+  if (newP.length < 6)       { showToast('❌ Mínimo 6 caracteres','error'); return; }
+  if (newP !== conf)          { showToast('❌ Las contraseñas no coinciden','error'); return; }
+  changePassword(newP);
+  showToast('✅ Contraseña actualizada 🔐','success');
+  document.getElementById('security-form').reset();
+});
+document.getElementById('btn-clear-all').addEventListener('click', () => {
+  if (confirm('¿Borrar TODOS los episodios? Irreversible.')) {
+    saveEpisodes([]); renderAdminEpisodes(); updateStats();
+    showToast('Todos los episodios eliminados','info');
+  }
+});
+document.getElementById('btn-logout').addEventListener('click', doLogout);
+
+/* ── Boot ─────────────────────────────────────────────────── */
+boot();
+</script>
+</body>
+</html>

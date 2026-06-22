@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Para Ti, Mi Amor 🌹 — Podcast de Corazón</title>
+  <meta name="description" content="Un podcast hecho con todo el amor del mundo, especialmente para ti.">
+  <meta name="theme-color" content="#7B2D4E">
+  <meta property="og:title" content="Para Ti, Mi Amor 🌹">
+  <meta property="og:description" content="Un podcast de amor hecho especialmente para ti">
+  <meta property="og:type" content="website">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lato:wght@300;400;700&family=Dancing+Script:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Background -->
+  <div class="bg-canvas" aria-hidden="true"></div>
+
+  <div class="app-wrapper">
+    <div class="container">
+
+      <!-- ── HEADER ─────────────────────────────────────────── -->
+      <header class="site-header fade-in">
+        <div class="header-badge">
+          <span>🎙️</span>
+          <span>Podcast de Amor</span>
+        </div>
+        <h1 class="site-title" id="podcast-title">Para Ti, Mi Amor</h1>
+        <p class="site-subtitle" id="podcast-subtitle">
+          Cada episodio es un pedacito de mi corazón para el tuyo
+        </p>
+        <div class="heart-divider">
+          <span class="heart-divider-icon">💗</span>
+        </div>
+      </header>
+
+      <!-- ── PHOTO FRAME ────────────────────────────────────── -->
+      <section class="photo-frame-section fade-in fade-in-delay-1" aria-label="Nuestra foto">
+        <div class="photo-frame-row">
+
+          <!-- Polaroid-style frame -->
+          <div
+            class="glass photo-frame-card"
+            id="photo-frame-card"
+            role="button"
+            tabindex="0"
+            aria-label="Abrir foto con mensaje de amor"
+          >
+            <div class="photo-thumb-wrap">
+              <img src="assets/tuyo.jpeg" alt="Nosotros" class="photo-thumb" loading="lazy">
+              <div class="photo-hover-overlay">
+                <span>💌 Ver mensaje</span>
+              </div>
+            </div>
+            <div class="photo-caption">
+              <span class="photo-label">Nuestra historia ✨</span>
+            </div>
+          </div>
+
+          <!-- Aside text -->
+          <div class="photo-aside">
+            <div class="photo-aside-title">Desde el 19 de Marzo, 2023</div>
+            <p class="photo-aside-text">
+              Cada día contigo ha sido el capítulo más bonito
+              de mi vida. Este podcast nació para recordarte
+              cuánto significas para mí.
+            </p>
+            <div class="anniversary-badge">
+              💑 3 años y 3 meses juntos
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ── FEATURED PLAYER ────────────────────────────────── -->
+      <section class="fade-in fade-in-delay-2" aria-label="Reproductor principal">
+        <div class="glass-heavy featured-player" id="featured-player">
+
+          <div class="now-playing-label" id="now-playing-label" style="display:none;">
+            <span class="now-playing-dot"></span>
+            <span>Reproduciendo ahora</span>
+          </div>
+
+          <div class="episode-meta">
+            <div class="episode-artwork" id="featured-artwork">
+              <span id="featured-artwork-emoji">🎙️</span>
+            </div>
+            <div class="episode-info">
+              <div class="episode-number" id="featured-ep-number">Selecciona un episodio</div>
+              <div class="episode-title"  id="featured-ep-title">Tu podcast de amor</div>
+              <div class="episode-date"   id="featured-ep-date">Toca un episodio de la lista para escuchar 🎶</div>
+            </div>
+          </div>
+
+          <!-- Progress -->
+          <div class="audio-controls">
+            <div class="progress-bar-wrap" id="progress-wrap">
+              <div class="progress-track">
+                <div class="progress-fill" id="progress-fill"></div>
+              </div>
+              <input type="range" class="progress-input" id="progress-input"
+                     min="0" max="100" value="0" step="0.1" aria-label="Progreso del audio">
+            </div>
+            <div class="time-labels">
+              <span id="time-current">0:00</span>
+              <span id="time-total">0:00</span>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls-row">
+              <button class="ctrl-btn" id="btn-rewind" aria-label="Retroceder 15s" title="−15s">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.75"/>
+                </svg>
+              </button>
+
+              <button class="ctrl-btn play-btn" id="btn-play" aria-label="Reproducir / Pausar">
+                <svg id="play-icon"  width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><polygon points="5,3 19,12 5,21"/></svg>
+                <svg id="pause-icon" width="26" height="26" viewBox="0 0 24 24" fill="currentColor" style="display:none;"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+              </button>
+
+              <button class="ctrl-btn" id="btn-forward" aria-label="Avanzar 15s" title="+15s">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.48-3.75"/>
+                </svg>
+              </button>
+            </div>
+
+            <!-- Volume -->
+            <div class="volume-row">
+              <span class="volume-icon" id="vol-icon">🔉</span>
+              <input type="range" class="volume-slider" id="volume-slider"
+                     min="0" max="1" value="0.8" step="0.01" aria-label="Volumen">
+              <span style="font-size:0.75rem;color:var(--text-muted);" id="vol-label">80%</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── LOVE BANNER ────────────────────────────────────── -->
+      <div class="glass love-banner fade-in fade-in-delay-3" id="love-banner">
+        <p class="love-quote" id="love-quote">
+          "Cada palabra que escuchas fue pensada para ti,<br>
+          porque eres la historia más bonita que me ha pasado."
+        </p>
+        <p class="love-from" id="love-from">— Con todo mi amor 💌</p>
+      </div>
+
+      <!-- ── EPISODE LIST ────────────────────────────────────── -->
+      <section aria-label="Lista de episodios">
+        <h2 class="section-heading fade-in fade-in-delay-4">
+          <span class="icon">🎶</span>
+          Episodios
+        </h2>
+        <div class="episode-list" id="episode-list" role="list">
+          <!-- Rendered by JS -->
+        </div>
+      </section>
+
+    </div><!-- /container -->
+  </div><!-- /app-wrapper -->
+
+  <!-- ── PHOTO LIGHTBOX ─────────────────────────────────────── -->
+  <div class="photo-modal" id="photo-modal" role="dialog" aria-modal="true" aria-label="Mensaje de amor">
+    <div class="photo-modal-inner glass-heavy" style="padding:2rem;">
+      <button class="photo-modal-close" id="photo-modal-close" aria-label="Cerrar">✕</button>
+
+      <div class="photo-modal-img-wrap">
+        <img src="assets/tuyo.jpeg" alt="Nosotros" class="photo-full">
+      </div>
+
+      <div class="photo-modal-msg" style="padding:2rem;background:rgba(255,255,255,0.05);border-radius:20px;border:1px solid rgba(192,73,107,0.25);">
+        <div class="modal-love-title">Para ti, mi amor 🌹</div>
+        <p class="modal-love-text">
+          "Desde el 19 de marzo de 2023,<br>
+          cada mañana tiene más sentido.<br><br>
+          Eres la persona que me hace querer<br>
+          ser mejor cada día. Esta foto,<br>
+          este podcast, cada nota, cada palabra…<br><br>
+          todo lo hago pensando en ti."
+        </p>
+        <p class="modal-love-from">— Tuyo, siempre y para siempre 💌</p>
+        <div class="modal-song-pill">
+          🎵 Nuestra canción: <em>Amapolas — Leo Rizi</em>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── ADMIN FAB ────────────────────────────────────────────── -->
+  <div class="admin-fab">
+    <a href="admin.html" class="btn btn-ghost" aria-label="Panel de administración">
+      🔒 Admin
+    </a>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+  /* ═══════════════════════════════════════════════════════════
+     INDEX PAGE LOGIC
+  ═══════════════════════════════════════════════════════════ */
+
+  const META_KEY = 'samira_podcast_meta';
+
+  /* ── Meta / Personalización ─────────────────────────────── */
+  function getMeta() {
+    try { return JSON.parse(localStorage.getItem(META_KEY)) || {}; } catch { return {}; }
+  }
+  function applyMeta() {
+    const m = getMeta();
+    if (m.podcastTitle)    document.getElementById('podcast-title').textContent    = m.podcastTitle;
+    if (m.podcastSubtitle) document.getElementById('podcast-subtitle').textContent = m.podcastSubtitle;
+    if (m.loveQuote)       document.getElementById('love-quote').innerHTML          = m.loveQuote;
+    if (m.loveFrom)        document.getElementById('love-from').textContent         = '— ' + m.loveFrom + ' 💌';
+  }
+
+  /* ── State ──────────────────────────────────────────────── */
+  let currentEpisodeId = null;
+
+  /* ── Render Episode List ────────────────────────────────── */
+  function renderEpisodes() {
+    const list     = document.getElementById('episode-list');
+    const episodes = getEpisodes();
+
+    if (episodes.length === 0) {
+      list.innerHTML = `
+        <div class="glass empty-state">
+          <div class="empty-icon">🎙️</div>
+          <h3>Próximamente…</h3>
+          <p>El primer episodio de amor está por llegar. ¡Espéralo con el corazón abierto! 🌹</p>
+        </div>`;
+      return;
+    }
+
+    list.innerHTML = episodes.map((ep, idx) => {
+      const epNum   = episodes.length - idx;
+      const isActive = ep.id === currentEpisodeId;
+      const isPlaying = isActive && Player.isPlaying;
+      return `
+        <article
+          class="glass episode-card ${isActive ? 'active' : ''}"
+          data-id="${ep.id}"
+          role="listitem"
+          tabindex="0"
+          aria-label="Episodio ${epNum}: ${ep.title}"
+          style="animation:fadeIn 0.5s ease ${idx*0.06}s both;"
+        >
+          <div class="ep-thumb">
+            <span>${ep.emoji || '🎙️'}</span>
+            <div class="play-overlay" aria-hidden="true">
+              ${isPlaying ? '⏸️' : (isActive ? '▶️' : '▶️')}
+            </div>
+          </div>
+          <div class="ep-info">
+            <div class="ep-title">${ep.title}</div>
+            <div class="ep-desc">${ep.description || 'Un episodio lleno de amor'}</div>
+          </div>
+          <div class="ep-meta">
+            <span class="ep-duration" id="dur-${ep.id}">${ep.cachedDuration || '–:––'}</span>
+            <span class="ep-badge">Ep. ${epNum}</span>
+          </div>
+        </article>`;
+    }).join('');
+
+    /* Attach events */
+    list.querySelectorAll('.episode-card').forEach(card => {
+      const activate = () => {
+        const id = card.dataset.id;
+        const ep = episodes.find(e => e.id === id);
+        if (!ep) return;
+
+        const epNum = episodes.length - episodes.findIndex(e => e.id === id);
+
+        if (id === currentEpisodeId) {
+          /* Same episode → toggle play/pause */
+          Player.toggle();
+        } else {
+          /* New episode → load and play */
+          currentEpisodeId = id;
+          loadFeaturedUI(ep, epNum);
+          Player.load(ep);
+        }
+      };
+      card.addEventListener('click', activate);
+      card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); } });
+    });
+  }
+
+  /* ── Load Featured UI (without starting audio) ───────────── */
+  function loadFeaturedUI(ep, epNum) {
+    document.getElementById('featured-ep-number').textContent = `Episodio ${epNum}`;
+    document.getElementById('featured-ep-title').textContent  = ep.title;
+    document.getElementById('featured-ep-date').textContent   = ep.description || formatDate(ep.createdAt);
+    document.getElementById('featured-artwork-emoji').textContent = ep.emoji || '🎙️';
+    document.getElementById('now-playing-label').style.display = 'flex';
+  }
+
+  /* ── Player UI Callbacks ────────────────────────────────── */
+  function updatePlayIcon(playing) {
+    document.getElementById('play-icon').style.display  = playing ? 'none'  : 'block';
+    document.getElementById('pause-icon').style.display = playing ? 'block' : 'none';
+  }
+
+  Player.onTimeUpdate((current, duration) => {
+    const pct = duration ? (current / duration) * 100 : 0;
+    document.getElementById('progress-fill').style.width  = `${pct}%`;
+    document.getElementById('progress-input').value       = pct;
+    document.getElementById('time-current').textContent   = formatTime(current);
+    document.getElementById('time-total').textContent     = formatTime(duration);
+
+    /* Cache duration on first read */
+    if (currentEpisodeId && !isNaN(duration) && duration > 0) {
+      const ep = getEpisodes().find(e => e.id === currentEpisodeId);
+      if (ep && !ep.cachedDuration) {
+        updateEpisode(currentEpisodeId, { cachedDuration: formatTime(duration) });
+        const el = document.getElementById(`dur-${currentEpisodeId}`);
+        if (el) el.textContent = formatTime(duration);
+      }
+    }
+  });
+
+  Player.onPlay(playing => {
+    updatePlayIcon(playing);
+    renderEpisodes(); /* Refresh overlay icons */
+  });
+
+  Player.onEnded(() => {
+    /* Auto-next episode */
+    const episodes = getEpisodes();
+    const idx = episodes.findIndex(e => e.id === currentEpisodeId);
+    if (idx !== -1 && idx < episodes.length - 1) {
+      const next = episodes[idx + 1];
+      currentEpisodeId = next.id;
+      loadFeaturedUI(next, episodes.length - (idx + 1));
+      Player.load(next);
+    } else {
+      updatePlayIcon(false);
+      showToast('¡Fin del episodio! 🌹', 'success');
+    }
+  });
+
+  Player.onError(() => {
+    updatePlayIcon(false);
+  });
+
+  /* ── Controls ───────────────────────────────────────────── */
+  document.getElementById('btn-play').addEventListener('click', () => {
+    const episodes = getEpisodes();
+    if (!currentEpisodeId) {
+      if (episodes.length > 0) {
+        const ep = episodes[0];
+        currentEpisodeId = ep.id;
+        loadFeaturedUI(ep, episodes.length);
+        Player.load(ep);
+      } else {
+        showToast('No hay episodios aún 🎙️', 'info');
+      }
+    } else {
+      Player.toggle();
+    }
+  });
+
+  document.getElementById('btn-rewind').addEventListener('click',  () => Player.seek(Player.currentTime - 15));
+  document.getElementById('btn-forward').addEventListener('click', () => Player.seek(Player.currentTime + 15));
+
+  document.getElementById('progress-input').addEventListener('input', e => {
+    Player.seekPercent(parseFloat(e.target.value) / 100);
+  });
+
+  const volSlider = document.getElementById('volume-slider');
+  const volLabel  = document.getElementById('vol-label');
+  const volIcon   = document.getElementById('vol-icon');
+
+  volSlider.addEventListener('input', e => {
+    const v = parseFloat(e.target.value);
+    Player.setVolume(v);
+    volLabel.textContent = `${Math.round(v * 100)}%`;
+    volIcon.textContent  = v === 0 ? '🔇' : v < 0.5 ? '🔉' : '🔊';
+  });
+  Player.setVolume(0.8);
+
+  /* ── Photo Lightbox ─────────────────────────────────────── */
+  const photoCard  = document.getElementById('photo-frame-card');
+  const photoModal = document.getElementById('photo-modal');
+  const photoClose = document.getElementById('photo-modal-close');
+
+  function openPhotoModal()  { photoModal.classList.add('open');    document.body.style.overflow = 'hidden'; }
+  function closePhotoModal() { photoModal.classList.remove('open'); document.body.style.overflow = ''; }
+
+  photoCard.addEventListener('click', openPhotoModal);
+  photoCard.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPhotoModal(); } });
+  photoClose.addEventListener('click', closePhotoModal);
+  photoModal.addEventListener('click', e => { if (e.target === photoModal) closePhotoModal(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePhotoModal(); });
+
+  /* ── Boot ───────────────────────────────────────────────── */
+  applyMeta();
+  renderEpisodes();
+
+  /* Pre-fill featured with first episode (no autoplay) */
+  const initEps = getEpisodes();
+  if (initEps.length > 0) {
+    const ep = initEps[0];
+    document.getElementById('featured-ep-number').textContent = `Episodio ${initEps.length}`;
+    document.getElementById('featured-ep-title').textContent  = ep.title;
+    document.getElementById('featured-ep-date').textContent   = ep.description || 'Tu podcast de amor';
+    document.getElementById('featured-artwork-emoji').textContent = ep.emoji || '🎙️';
+    currentEpisodeId = ep.id;
+  }
+  </script>
+</body>
+</html>
