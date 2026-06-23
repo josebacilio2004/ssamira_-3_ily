@@ -276,8 +276,12 @@
         const epNum = episodes.length - episodes.findIndex(e => e.id === id);
 
         if (id === currentEpisodeId) {
-          /* Same episode → toggle play/pause */
-          Player.toggle();
+          /* Same episode → toggle play/pause (load first if needed) */
+          if (Player.currentId === id) {
+            Player.toggle();
+          } else {
+            Player.load(ep);
+          }
         } else {
           /* New episode → load and play */
           currentEpisodeId = id;
@@ -360,7 +364,12 @@
         showToast('No hay episodios aún 🎙️', 'info');
       }
     } else {
-      Player.toggle();
+      if (Player.currentId === currentEpisodeId) {
+        Player.toggle();
+      } else {
+        const ep = episodes.find(e => e.id === currentEpisodeId);
+        if (ep) Player.load(ep);
+      }
     }
   });
 

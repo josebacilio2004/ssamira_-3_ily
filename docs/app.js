@@ -7,10 +7,32 @@ const STORAGE_KEY = 'samira_podcast_episodes';
 const PASS_KEY    = 'samira_admin_pass';
 const DEFAULT_PASSWORD = 'teamo123';
 
+const DEFAULT_EPISODES = [
+  {
+    id: "ep-1",
+    title: "El Día que Todo Cambió 🌹",
+    src: "audio/1.mp3",
+    description: "Nuestra historia desde el 3 de marzo de 2023. Un momento especial para recordar.",
+    emoji: "💖",
+    createdAt: "2026-06-22T23:51:53.000Z",
+    cachedDuration: ""
+  }
+];
+
 /* ── Data Layer ──────────────────────────────────────────── */
 function getEpisodes() {
-  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
-  catch { return []; }
+  try {
+    const local = localStorage.getItem(STORAGE_KEY);
+    if (!local) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULT_EPISODES));
+      return DEFAULT_EPISODES;
+    }
+    const parsed = JSON.parse(local);
+    return (Array.isArray(parsed) && parsed.length > 0) ? parsed : DEFAULT_EPISODES;
+  }
+  catch {
+    return DEFAULT_EPISODES;
+  }
 }
 function saveEpisodes(eps) { localStorage.setItem(STORAGE_KEY, JSON.stringify(eps)); }
 function addEpisode(ep) {
