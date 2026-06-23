@@ -12,7 +12,7 @@ const DEFAULT_EPISODES = [
     id: "ep-1",
     title: "El Día que Todo Cambió 🌹",
     src: "audio/1.mp3",
-    description: "Nuestra historia desde el 3 de marzo de 2023. Un momento especial para recordar.",
+    description: "Nuestra historia desde el 3 de marzo de 2023. Te amo mucho, Ssamira, mi niñita hermosa.",
     emoji: "💖",
     createdAt: "2026-06-22T23:51:53.000Z",
     cachedDuration: ""
