@@ -1,0 +1,10 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Audios — lectura pública, escritura solo autenticada
+    match /audio/{allPaths=**} {
+      allow read: if true;
+      allow write: if true; // Cambiar a "if request.auth != null;" en producción
+    }
+  }
+}

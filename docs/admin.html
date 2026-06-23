@@ -509,9 +509,28 @@ function checkFirebaseStatus() {
 function getFirebaseConfig() {
   try { return JSON.parse(localStorage.getItem(FB_KEY)); } catch { return null; }
 }
+/* ── Pre-loaded Firebase config from CLI ─────────────────
+   Proyecto: ssamira-podcast | App: Samira Podcast Web
+   Generado automáticamente por firebase apps:sdkconfig
+─────────────────────────────────────────────────────── */
+const FIREBASE_CONFIG_DEFAULT = {
+  apiKey:            "AIzaSyD8Ia_q0I5Ve6AXTa920l2CHOp6lx2DXJg",
+  authDomain:        "ssamira-podcast.firebaseapp.com",
+  projectId:         "ssamira-podcast",
+  storageBucket:     "ssamira-podcast.firebasestorage.app",
+  messagingSenderId: "480011142826",
+  appId:             "1:480011142826:web:a3bd11eea3b4f206f532d3",
+};
+
 function loadFirebaseConfig() {
-  const cfg = getFirebaseConfig();
-  if (!cfg) return;
+  /* Use stored config or fall back to the pre-loaded one */
+  const cfg = getFirebaseConfig() || FIREBASE_CONFIG_DEFAULT;
+
+  /* If nothing stored yet, persist the default */
+  if (!getFirebaseConfig()) {
+    localStorage.setItem(FB_KEY, JSON.stringify(FIREBASE_CONFIG_DEFAULT));
+  }
+
   document.getElementById('fb-api-key').value        = cfg.apiKey        || '';
   document.getElementById('fb-project-id').value     = cfg.projectId     || '';
   document.getElementById('fb-storage-bucket').value = cfg.storageBucket || '';
@@ -519,10 +538,14 @@ function loadFirebaseConfig() {
   document.getElementById('fb-messaging-id').value   = cfg.messagingSenderId || '';
   document.getElementById('fb-app-id').value         = cfg.appId         || '';
   document.getElementById('firebase-connected-banner').style.display = 'none';
-  /* Auto-init if config exists */
+
+  /* Auto-init */
   if (cfg.apiKey && cfg.projectId) {
     window.initFirebase && window.initFirebase(cfg).then(ok => {
-      if (ok) document.getElementById('firebase-connected-banner').style.display = 'block';
+      if (ok) {
+        document.getElementById('firebase-connected-banner').style.display = 'block';
+        showToast('🔥 Firebase conectado automáticamente', 'success', 3000);
+      }
     });
   }
 }
