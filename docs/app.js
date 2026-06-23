@@ -160,3 +160,53 @@ if (document.readyState === 'loading') {
 } else {
   createPetals();
 }
+
+/* ── Dynamic Beating Heart Favicon ────────────────────────── */
+function initDynamicFavicon() {
+  const favicon = document.getElementById('dynamic-favicon') || (() => {
+    const link = document.createElement('link');
+    link.id = 'dynamic-favicon';
+    link.rel = 'icon';
+    document.head.appendChild(link);
+    return link;
+  })();
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 32;
+  canvas.height = 32;
+  const ctx = canvas.getContext('2d');
+  
+  let frame = 0;
+  // Latido "lub-dub" realista: alternamos tamaño y emojis de amor
+  const emojis = ['❤️', '💖', '💗', '💖'];
+  const scales = [1.0, 1.25, 1.0, 1.15];
+
+  function drawFavicon() {
+    ctx.clearRect(0, 0, 32, 32);
+    ctx.font = '24px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    const idx = frame % 4;
+    const scale = scales[idx];
+    const emoji = emojis[idx];
+    
+    ctx.save();
+    ctx.translate(16, 16);
+    ctx.scale(scale, scale);
+    ctx.fillText(emoji, 0, 2);
+    ctx.restore();
+
+    favicon.href = canvas.toDataURL('image/png');
+    frame++;
+  }
+
+  // Intervalo de 300ms para simular el latido del corazón
+  setInterval(drawFavicon, 300);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initDynamicFavicon);
+} else {
+  initDynamicFavicon();
+}

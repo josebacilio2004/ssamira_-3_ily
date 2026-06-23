@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>QR — Para Ssamira, Mi Niñita Hermosa 🌹</title>
+  <link rel="icon" id="dynamic-favicon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>❤️</text></svg>">
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
 
   <style>
@@ -263,6 +264,37 @@
     document.getElementById('qr-img').addEventListener('error', function() {
       this.src = 'https://quickchart.io/qr?text=https%3A%2F%2Fjosebacilio2004.github.io%2Fssamira_-3_ily%2F&size=300&dark=7B2D4E&light=ffffff&ecLevel=H';
     });
+
+    /* Dynamic beating heart favicon */
+    (function() {
+      const favicon = document.getElementById('dynamic-favicon') || (() => {
+        const link = document.createElement('link');
+        link.id = 'dynamic-favicon';
+        link.rel = 'icon';
+        document.head.appendChild(link);
+        return link;
+      })();
+      const canvas = document.createElement('canvas');
+      canvas.width = 32; canvas.height = 32;
+      const ctx = canvas.getContext('2d');
+      let frame = 0;
+      const emojis = ['❤️', '💖', '💗', '💖'];
+      const scales = [1.0, 1.25, 1.0, 1.15];
+      function drawFavicon() {
+        ctx.clearRect(0, 0, 32, 32);
+        ctx.font = '24px sans-serif';
+        ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        const idx = frame % 4;
+        ctx.save();
+        ctx.translate(16, 16);
+        ctx.scale(scales[idx], scales[idx]);
+        ctx.fillText(emojis[idx], 0, 2);
+        ctx.restore();
+        favicon.href = canvas.toDataURL('image/png');
+        frame++;
+      }
+      setInterval(drawFavicon, 300);
+    })();
   </script>
 </body>
 </html>
